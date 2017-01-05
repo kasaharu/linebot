@@ -14,7 +14,15 @@ class LinebotController < ApplicationController
 
     puts events = client.parse_events_from(request.body.read)
 
-    response = client.reply_message(events[0]['replyToken'], message)
-    p response
+    events.each do |event|
+      case event
+      when Line::Bot::Event::Message
+        case event.type
+        when Line::Bot::Event::MessageType::Text
+          response = client.reply_message(event['replyToken'], message)
+          p response
+        end
+      end
+    end
   end
 end
