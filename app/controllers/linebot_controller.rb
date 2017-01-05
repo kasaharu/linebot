@@ -12,7 +12,7 @@ class LinebotController < ApplicationController
         config.channel_token = ENV["LINE_CHANNEL_TOKEN"]
     }
 
-    events = client.parse_events_from(request.body.read)
+    puts events = client.parse_events_from(request.body.read)
 
     response = client.reply_message(events[0]['replyToken'], message)
     p response
