@@ -6,7 +6,7 @@ class LinebotController < ApplicationController
   def callback
     message = {
       type: 'text',
-      text: 'hello, LINE bot'
+      text: 'Hello, This is LINE bot'
     }
 
     client = Line::Bot::Client.new { |config|
