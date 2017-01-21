@@ -27,6 +27,18 @@ class LinebotController < ApplicationController
           when 'アニメ一覧'
             message['text'] = fetch_anime_now
           when 'こんにちは'
+            userId =  event['source']['userId']
+            resProfile = client.get_profile(userId)
+            case resProfile
+            when Net::HTTPSuccess then
+              contact = JSON.parse(resProfile.body)
+              p contact['displayName']
+              p contact['pictureUrl']
+              p contact['statusMessage']
+              message['text'] = "#{contact['displayName']}さん こんにちは♪"
+            else
+              p "#{resProfile.code} #{resProfile.body}"
+            end
           else
             return
           end
@@ -35,6 +47,10 @@ class LinebotController < ApplicationController
         end
       end
     end
+  end
+
+  def greet
+
   end
 
   def fetch_weather
