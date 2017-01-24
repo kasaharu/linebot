@@ -25,7 +25,8 @@ class LinebotController < ApplicationController
           when '天気'
             message['text'] = fetch_weather
           when 'アニメ一覧'
-            message['text'] = fetch_anime_now
+            target_season = Annict.detect_target_season
+            message['text'] = fetch_anime(target_season)
           when 'こんにちは'
             userId =  event['source']['userId']
             resProfile = client.get_profile(userId)
@@ -62,8 +63,8 @@ class LinebotController < ApplicationController
     end
   end
 
-  def fetch_anime_now
-    response = Annict.fetch
+  def fetch_anime(target_season)
+    response = Annict.fetch(target_season)
     if response.code == '200'
       return Annict.parse_msg(response.body)
     else
