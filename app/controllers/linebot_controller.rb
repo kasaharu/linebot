@@ -44,9 +44,7 @@ class LinebotController < ApplicationController
     case resProfile
     when Net::HTTPSuccess then
       contact = JSON.parse(resProfile.body)
-      p contact['displayName']
-      p contact['pictureUrl']
-      p contact['statusMessage']
+      p contact['displayName'] + contact['pictureUrl'] + contact['statusMessage']
       return "#{contact['displayName']}さん こんにちは♪"
     else
       return "#{resProfile.code} #{resProfile.body}"
