@@ -28,18 +28,7 @@ class LinebotController < ApplicationController
             target_season = Annict.detect_target_season
             message['text'] = fetch_anime(target_season)
           when 'こんにちは'
-            userId =  event['source']['userId']
-            resProfile = client.get_profile(userId)
-            case resProfile
-            when Net::HTTPSuccess then
-              contact = JSON.parse(resProfile.body)
-              p contact['displayName']
-              p contact['pictureUrl']
-              p contact['statusMessage']
-              message['text'] = "#{contact['displayName']}さん こんにちは♪"
-            else
-              p "#{resProfile.code} #{resProfile.body}"
-            end
+            message['text'] = greet(client, event['source']['userId'])
           else
             return
           end
@@ -50,8 +39,18 @@ class LinebotController < ApplicationController
     end
   end
 
-  def greet
-
+  def greet(client, userId)
+    resProfile = client.get_profile(userId)
+    case resProfile
+    when Net::HTTPSuccess then
+      contact = JSON.parse(resProfile.body)
+      p contact['displayName']
+      p contact['pictureUrl']
+      p contact['statusMessage']
+      return "#{contact['displayName']}さん こんにちは♪"
+    else
+      return "#{resProfile.code} #{resProfile.body}"
+    end
   end
 
   def fetch_weather
