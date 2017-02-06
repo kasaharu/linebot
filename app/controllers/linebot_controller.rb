@@ -1,6 +1,7 @@
 require 'line/bot'
 require 'net/http'
 require 'uri'
+require 'rexml/document'
 
 class LinebotController < ApplicationController
   def callback
@@ -23,19 +24,19 @@ class LinebotController < ApplicationController
         when Line::Bot::Event::MessageType::Text
           if event['message']['text'].include?("とは")
             target_word = event['message']['text'].sub(/とは/, "")
-            search_word(target_word)
-            return
-          end
-          case event['message']['text']
-          when '天気'
-            message['text'] = fetch_weather
-          when 'アニメ一覧'
-            target_season = DateUtil.detect_target_season
-            message['text'] = fetch_anime(target_season)
-          when 'こんにちは'
-            message['text'] = greet(client, event['source']['userId'])
+            message['text'] = search_word(target_word)
           else
-            return
+            case event['message']['text']
+            when '天気'
+              message['text'] = fetch_weather
+            when 'アニメ一覧'
+              target_season = DateUtil.detect_target_season
+              message['text'] = fetch_anime(target_season)
+            when 'こんにちは'
+              message['text'] = greet(client, event['source']['userId'])
+            else
+              return
+            end
           end
           response = client.reply_message(event['replyToken'], message)
           p response.body
@@ -52,7 +53,13 @@ class LinebotController < ApplicationController
       http.get(uri.request_uri)
     }
     if response.code == '200'
-      puts response.body
+      doc = REXML::Document.new(response.body)
+      result = ''
+      doc.each_element("//rdf:RDF/item/description") do |elm|
+        result += "-----\n"
+        result += "#{elm.text}\n"
+      end
+      return result
     else
       puts 'ERROR'
     end
